@@ -20,4 +20,19 @@ $routes->group('api', static function ($routes) {
         'customers',
         'Api\CustomerController::create'
     );
+
+    $routes->put(
+        'customers/(:num)',
+        'Api\CustomerController::update/$1'
+    );
+
+    $routes->patch(
+        'customers/(:num)/activate',
+        'Api\CustomerController::activate/$1'
+    );
+
+    $routes->patch(
+        'customers/(:num)/deactivate',
+        'Api\CustomerController::deactivate/$1'
+    );
 });

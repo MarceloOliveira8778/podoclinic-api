@@ -3,9 +3,9 @@
 namespace App\Controllers\Api;
 
 use App\Controllers\BaseController;
+use App\Entities\Customer;
 use App\Models\CustomerModel;
 use CodeIgniter\API\ResponseTrait;
-use App\Entities\Customer;
 
 class CustomerController extends BaseController
 {
@@ -15,12 +15,25 @@ class CustomerController extends BaseController
     {
         $customerModel = new CustomerModel();
 
+        $name = trim((string) $this->request->getGet('name'));
+        $phone = $this->normalizePhone(
+            (string) $this->request->getGet('phone')
+        );
+
+        if ($name !== '') {
+            $customerModel->like('name', $name);
+        }
+
+        if ($phone !== '') {
+            $customerModel->like('phone', $phone);
+        }
+
         $customers = $customerModel
             ->orderBy('name', 'ASC')
             ->findAll();
 
         $formattedCustomers = array_map(
-            fn ($customer) => $this->formatCustomer($customer),
+            fn (Customer $customer) => $this->formatCustomer($customer),
             $customers
         );
 
@@ -34,7 +47,9 @@ class CustomerController extends BaseController
         $customer = $customerModel->find($id);
 
         if ($customer === null) {
-            return $this->failNotFound('Cliente não encontrado.');
+            return $this->failNotFound(
+                'Cliente não encontrado.'
+            );
         }
 
         return $this->respond(
@@ -53,10 +68,8 @@ class CustomerController extends BaseController
         }
 
         if (isset($customerRequest['phone'])) {
-            $customerRequest['phone'] = preg_replace(
-                '/\D/',
-                '',
-                $customerRequest['phone']
+            $customerRequest['phone'] = $this->normalizePhone(
+                (string) $customerRequest['phone']
             );
         }
 
@@ -75,6 +88,98 @@ class CustomerController extends BaseController
         return $this->respondCreated(
             $this->formatCustomer($customer)
         );
+    }
+
+    public function update($id = null)
+    {
+        $customerModel = new CustomerModel();
+
+        $customer = $customerModel->find($id);
+
+        if ($customer === null) {
+            return $this->failNotFound(
+                'Cliente não encontrado.'
+            );
+        }
+
+        $customerRequest = $this->request->getJSON(true);
+
+        if (!is_array($customerRequest)) {
+            return $this->failValidationErrors(
+                'Dados da requisição inválidos.'
+            );
+        }
+
+        if (isset($customerRequest['phone'])) {
+            $customerRequest['phone'] = $this->normalizePhone(
+                (string) $customerRequest['phone']
+            );
+        }
+
+        /*
+         * isActive pertence ao contrato da API.
+         * is_active pertence ao banco de dados.
+         */
+        if (array_key_exists('isActive', $customerRequest)) {
+            $customerRequest['is_active'] = $customerRequest['isActive'];
+            unset($customerRequest['isActive']);
+        }
+
+        if (!$customerModel->update($id, $customerRequest)) {
+            return $this->failValidationErrors(
+                $customerModel->errors()
+            );
+        }
+
+        $updatedCustomer = $customerModel->find($id);
+
+        return $this->respond(
+            $this->formatCustomer($updatedCustomer)
+        );
+    }
+
+    public function activate($id = null)
+    {
+        return $this->changeActiveStatus($id, true);
+    }
+
+    public function deactivate($id = null)
+    {
+        return $this->changeActiveStatus($id, false);
+    }
+
+    private function changeActiveStatus(
+        $id,
+        bool $isActive
+    ) {
+        $customerModel = new CustomerModel();
+
+        $customer = $customerModel->find($id);
+
+        if ($customer === null) {
+            return $this->failNotFound(
+                'Cliente não encontrado.'
+            );
+        }
+
+        if (!$customerModel->update($id, [
+            'is_active' => $isActive,
+        ])) {
+            return $this->failServerError(
+                'Não foi possível alterar a situação do cliente.'
+            );
+        }
+
+        $updatedCustomer = $customerModel->find($id);
+
+        return $this->respond(
+            $this->formatCustomer($updatedCustomer)
+        );
+    }
+
+    private function normalizePhone(string $phone): string
+    {
+        return preg_replace('/\D/', '', $phone) ?? '';
     }
 
     private function formatCustomer(Customer $customer): array

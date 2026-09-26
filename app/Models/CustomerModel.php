@@ -29,7 +29,8 @@ class CustomerModel extends Model
         ],
         'phone' => [
             'label' => 'Celular',
-            'rules' => 'required|max_length[20]',
+            //'rules' => 'required|max_length[20]',
+            'rules' => 'required|min_length[10]|max_length[11]',
         ],
     ];
 }
