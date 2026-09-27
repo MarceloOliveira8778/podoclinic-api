@@ -6,6 +6,8 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 
 $routes->group('api', static function ($routes) {
+
+    // Customer
     $routes->get(
         'customers',
         'Api\CustomerController::index'
@@ -34,5 +36,36 @@ $routes->group('api', static function ($routes) {
     $routes->patch(
         'customers/(:num)/deactivate',
         'Api\CustomerController::deactivate/$1'
+    );
+
+    // Product
+    $routes->get(
+        'products',
+        'Api\ProductController::index'
+    );
+
+    $routes->get(
+        'products/(:num)',
+        'Api\ProductController::show/$1'
+    );
+
+    $routes->post(
+        'products',
+        'Api\ProductController::create'
+    );
+
+    $routes->put(
+        'products/(:num)',
+        'Api\ProductController::update/$1'
+    );
+
+    $routes->patch(
+        'products/(:num)/activate',
+        'Api\ProductController::activate/$1'
+    );
+
+    $routes->patch(
+        'products/(:num)/deactivate',
+        'Api\ProductController::deactivate/$1'
     );
 });
