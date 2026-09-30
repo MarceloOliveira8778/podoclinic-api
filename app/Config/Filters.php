@@ -34,6 +34,8 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        'auth'          => \App\Filters\AuthenticationFilter::class,
+        'permission'    => \App\Filters\PermissionFilter::class,
     ];
 
     /**
@@ -70,6 +72,7 @@ class Filters extends BaseFilters
      *     after: array<string, array{except: list<string>|string}>|list<string>
      * }
      */
+    /*
     public array $globals = [
         'before' => [
             // 'honeypot',
@@ -79,6 +82,19 @@ class Filters extends BaseFilters
         'after' => [
             // 'honeypot',
             // 'secureheaders',
+        ],
+    ];
+    */
+    public array $globals = [
+        'before' => [
+            'auth' => [
+                'except' => [
+                    'api/auth/login',
+                ],
+            ],
+        ],
+        'after' => [
+            'toolbar',
         ],
     ];
 
