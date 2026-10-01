@@ -139,5 +139,45 @@ $routes->group('api', static function ($routes) {
             'Api\UserController::deactivate/$1',
             ['filter' => 'permission:user.deactivate']
         );
+
+        /*
+        * Financial Category
+        */
+
+        $routes->get(
+            'financial-categories',
+            'Api\FinancialCategoryController::index',
+            ['filter' => 'permission:financial_category.manage']
+        );
+
+        $routes->get(
+            'financial-categories/(:num)',
+            'Api\FinancialCategoryController::show/$1',
+            ['filter' => 'permission:financial_category.manage']
+        );
+
+        $routes->post(
+            'financial-categories',
+            'Api\FinancialCategoryController::create',
+            ['filter' => 'permission:financial_category.manage']
+        );
+
+        $routes->put(
+            'financial-categories/(:num)',
+            'Api\FinancialCategoryController::update/$1',
+            ['filter' => 'permission:financial_category.manage']
+        );
+
+        $routes->patch(
+            'financial-categories/(:num)/activate',
+            'Api\FinancialCategoryController::activate/$1',
+            ['filter' => 'permission:financial_category.manage']
+        );
+
+        $routes->patch(
+            'financial-categories/(:num)/deactivate',
+            'Api\FinancialCategoryController::deactivate/$1',
+            ['filter' => 'permission:financial_category.manage']
+        );
     });
 });
