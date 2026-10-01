@@ -147,7 +147,13 @@ $routes->group('api', static function ($routes) {
         $routes->get(
             'financial-categories',
             'Api\FinancialCategoryController::index',
-            ['filter' => 'permission:financial_category.manage']
+            ['filter' => 'permission:financial_category.view']
+        );
+
+        $routes->get(
+            'financial-movements/summary',
+            'Api\FinancialMovementController::summary',
+            ['filter' => 'permission:financial_movement.view']
         );
 
         $routes->get(
@@ -178,6 +184,28 @@ $routes->group('api', static function ($routes) {
             'financial-categories/(:num)/deactivate',
             'Api\FinancialCategoryController::deactivate/$1',
             ['filter' => 'permission:financial_category.manage']
+        );
+
+        /*
+        * Financial Movement
+        */
+
+        $routes->get(
+            'financial-movements',
+            'Api\FinancialMovementController::index',
+            ['filter' => 'permission:financial_movement.view']
+        );
+
+        $routes->get(
+            'financial-movements/(:num)',
+            'Api\FinancialMovementController::show/$1',
+            ['filter' => 'permission:financial_movement.view']
+        );
+
+        $routes->post(
+            'financial-movements',
+            'Api\FinancialMovementController::create',
+            ['filter' => 'permission:financial_movement.create']
         );
     });
 });

@@ -22,10 +22,12 @@ class FinancialCategoryController extends BaseController
             trim((string) $this->request->getGet('type'))
         );
 
-        $builder = $model->orderBy(
-            'name',
-            'ASC'
-        );
+        $builder = $model
+            ->where('is_active', true)
+            ->orderBy(
+                'name',
+                'ASC'
+            );
 
         if ($type !== '') {
             if (!in_array(
