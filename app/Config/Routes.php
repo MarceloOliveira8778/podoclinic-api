@@ -207,5 +207,45 @@ $routes->group('api', static function ($routes) {
             'Api\FinancialMovementController::create',
             ['filter' => 'permission:financial_movement.create']
         );
+
+        /*
+        * Stock Movements
+        */
+
+        $routes->post(
+            'stock-movements/entries',
+            'Api\StockMovementController::entry',
+            ['filter' => 'permission:stock.entry']
+        );
+
+        $routes->post(
+            'stock-movements/exits',
+            'Api\StockMovementController::exit',
+            ['filter' => 'permission:stock.exit']
+        );
+
+        $routes->get(
+            'stock',
+            'Api\StockController::index',
+            ['filter' => 'permission:stock.view']
+        );
+
+        $routes->get(
+            'stock-movements',
+            'Api\StockMovementController::index',
+            ['filter' => 'permission:stock.view']
+        );
+
+        $routes->post(
+            'purchases',
+            'Api\PurchaseController::create',
+            ['filter' => 'permission:purchase.create']
+        );
+
+        $routes->get(
+            'purchases',
+            'Api\PurchaseController::index',
+            ['filter' => 'permission:purchase.view']
+        );
     });
 });
