@@ -247,5 +247,11 @@ $routes->group('api', static function ($routes) {
             'Api\PurchaseController::index',
             ['filter' => 'permission:purchase.view']
         );
+
+        $routes->post(
+            'sales',
+            'Api\SaleController::create',
+            ['filter' => 'permission:sale.create']
+        );
     });
 });
