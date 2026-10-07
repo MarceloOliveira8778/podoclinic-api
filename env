@@ -67,3 +67,12 @@
 #--------------------------------------------------------------------
 
 # logger.threshold = 4
+
+# WhatsApp - Replacement reminders
+# Available variables:
+# {customerName}
+# {customerFullName}
+# {productName}
+# {replacementDate}
+
+# whatsapp.reminderMessage = "Olá, {customerName}! Tudo bem?\n\nEstamos entrando em contato para saber se você precisa repor o produto {productName}."

@@ -253,5 +253,33 @@ $routes->group('api', static function ($routes) {
             'Api\SaleController::create',
             ['filter' => 'permission:sale.create']
         );
+
+        /*
+        * Customer reminders
+        */
+
+        $routes->get(
+            'customer-reminders',
+            'Api\CustomerReminderController::index',
+            ['filter' => 'permission:customer_reminder.view']
+        );
+
+        $routes->patch(
+            'customer-reminders/(:num)/contacted',
+            'Api\CustomerReminderController::markAsContacted/$1',
+            ['filter' => 'permission:customer_reminder.update']
+        );
+
+        $routes->patch(
+            'customer-reminders/(:num)/cancelled',
+            'Api\CustomerReminderController::cancel/$1',
+            ['filter' => 'permission:customer_reminder.update']
+        );
+
+        $routes->get(
+            'customer-reminders/(:num)/whatsapp-link',
+            'Api\CustomerReminderController::whatsAppLink/$1',
+            ['filter' => 'permission:customer_reminder.view']
+        );
     });
 });
