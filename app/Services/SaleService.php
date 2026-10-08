@@ -536,4 +536,168 @@ class SaleService
             );
         }
     }
+
+    public function getSales(array $filters = []): array
+    {
+        $startDate = $filters['startDate'] ?? null;
+        $endDate = $filters['endDate'] ?? null;
+        $customerId = $filters['customerId'] ?? null;
+        $productId = $filters['productId'] ?? null;
+        $paymentMethod = $filters['paymentMethod'] ?? null;
+
+        // Validação das datas.
+        foreach ([
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        ] as $field => $value) {
+            if ($value === null) {
+                continue;
+            }
+
+            if (!is_string($value)) {
+                throw new BusinessException(
+                    "O campo {$field} deve conter uma data válida."
+                );
+            }
+
+            $date = DateTimeImmutable::createFromFormat(
+                '!Y-m-d',
+                $value
+            );
+
+            if (
+                $date === false
+                || $date->format('Y-m-d') !== $value
+            ) {
+                throw new BusinessException(
+                    "O campo {$field} deve estar no formato YYYY-MM-DD."
+                );
+            }
+        }
+
+        if (
+            $startDate !== null
+            && $endDate !== null
+            && $startDate > $endDate
+        ) {
+            throw new BusinessException(
+                'A data inicial não pode ser maior que a data final.'
+            );
+        }
+
+        // Validação dos IDs.
+        foreach ([
+            'customerId' => $customerId,
+            'productId' => $productId,
+        ] as $field => $value) {
+            if ($value === null) {
+                continue;
+            }
+
+            if (
+                !is_scalar($value)
+                || !ctype_digit((string) $value)
+                || (int) $value <= 0
+            ) {
+                throw new BusinessException(
+                    "O campo {$field} deve conter um ID válido."
+                );
+            }
+        }
+
+        // Validação da forma de pagamento.
+        if ($paymentMethod !== null) {
+            if (
+                !is_string($paymentMethod)
+                || !in_array(
+                    $paymentMethod,
+                    ['CASH', 'PIX'],
+                    true
+                )
+            ) {
+                throw new BusinessException(
+                    'A forma de pagamento deve ser CASH ou PIX.'
+                );
+            }
+        }
+
+        $saleModel = new SaleModel();
+
+        $builder = $saleModel->builder();
+
+        $builder->select([
+            'sale.id',
+            'sale.customer_id',
+            'sale.product_id',
+            'sale.financial_category_id',
+            'sale.created_by_user_id',
+            'sale.quantity',
+            'sale.total_amount',
+            'sale.payment_method',
+            'sale.sale_date',
+            'sale.average_duration_days_snapshot',
+            'sale.notes',
+            'sale.created_at',
+            'sale.updated_at',
+            'customer.name AS customer_name',
+            'customer.phone AS customer_phone',
+            'product.name AS product_name',
+            'user.name AS created_by_user_name',
+        ]);
+
+        $builder->join(
+            'customer',
+            'customer.id = sale.customer_id'
+        );
+
+        $builder->join(
+            'product',
+            'product.id = sale.product_id'
+        );
+
+        $builder->join(
+            'user',
+            'user.id = sale.created_by_user_id'
+        );
+
+        if ($startDate !== null) {
+            $builder->where(
+                'sale.sale_date >=',
+                $startDate
+            );
+        }
+
+        if ($endDate !== null) {
+            $builder->where(
+                'sale.sale_date <=',
+                $endDate
+            );
+        }
+
+        if ($customerId !== null) {
+            $builder->where(
+                'sale.customer_id',
+                (int) $customerId
+            );
+        }
+
+        if ($productId !== null) {
+            $builder->where(
+                'sale.product_id',
+                (int) $productId
+            );
+        }
+
+        if ($paymentMethod !== null) {
+            $builder->where(
+                'sale.payment_method',
+                $paymentMethod
+            );
+        }
+
+        $builder->orderBy('sale.sale_date', 'DESC');
+        $builder->orderBy('sale.id', 'DESC');
+
+        return $builder->get()->getResultArray();
+    }
 }
