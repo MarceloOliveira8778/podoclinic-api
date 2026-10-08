@@ -27,6 +27,12 @@ $routes->group('api', static function ($routes) {
 
         // Customer
         $routes->get(
+            'customers/lookup',
+            'Api\CustomerController::lookup',
+            ['filter' => 'permission:customer.lookup']
+        );
+
+        $routes->get(
             'customers',
             'Api\CustomerController::index',
             ['filter' => 'permission:customer.view']

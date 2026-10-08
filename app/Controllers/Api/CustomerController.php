@@ -6,6 +6,9 @@ use App\Controllers\BaseController;
 use App\Entities\Customer;
 use App\Models\CustomerModel;
 use CodeIgniter\API\ResponseTrait;
+use App\Services\CustomerService;
+use App\Exceptions\BusinessException;
+use Throwable;
 
 class CustomerController extends BaseController
 {
@@ -192,5 +195,40 @@ class CustomerController extends BaseController
             'createdAt' => $customer->created_at,
             'updatedAt' => $customer->updated_at,
         ];
+    }
+
+    public function lookup()
+    {
+        try {
+            $search = $this->request->getGet('search');
+
+            if (!is_string($search)) {
+                return $this->failValidationErrors(
+                    'Informe um termo válido para pesquisar clientes.'
+                );
+            }
+
+            $service = new CustomerService();
+
+            $customers = $service->lookup($search);
+
+            return $this->respond($customers);
+        } catch (BusinessException $exception) {
+            return $this->failValidationErrors(
+                $exception->getMessage()
+            );
+        } catch (Throwable $exception) {
+            log_message(
+                'error',
+                'Erro ao pesquisar clientes: {message}',
+                [
+                    'message' => $exception->getMessage(),
+                ]
+            );
+
+            return $this->failServerError(
+                'Não foi possível pesquisar clientes.'
+            );
+        }
     }
 }
