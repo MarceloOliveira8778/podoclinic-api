@@ -101,7 +101,8 @@ class FinancialReportService
                     ),
                     0
                 ) AS total_expense
-            ");
+            ")
+            ->where('fm.reversed_at', null);
 
         $this->applyFilters(
             $builder,

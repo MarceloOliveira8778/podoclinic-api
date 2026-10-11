@@ -270,6 +270,16 @@ $routes->group('api', static function ($routes) {
         );
 
         /*
+        * Cancelamento de vendas
+        * Permissão exclusiva do OWNER.
+        */
+        $routes->patch(
+            'sales/(:num)/cancel',
+            'Api\SaleCancellationController::cancel/$1',
+            ['filter' => 'permission:sale.cancel']
+        );
+
+        /*
         * Customer reminders
         */
 

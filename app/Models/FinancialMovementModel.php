@@ -20,6 +20,7 @@ class FinancialMovementModel extends Model
         'amount',
         'payment_method',
         'movement_date',
+        'sale_id',
     ];
 
     protected $useTimestamps = true;

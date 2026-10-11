@@ -265,6 +265,8 @@ class SaleService
 
                 'movement_date' =>
                     $saleData['sale_date'],
+
+                'sale_id' => $saleId,
             ]);
 
             /*
